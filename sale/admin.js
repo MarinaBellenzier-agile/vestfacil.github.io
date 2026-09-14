@@ -1,7 +1,7 @@
 const DRAFT_KEY = "saleProductsDraft";
 
 let products = [];
-let uploadedImageData = "";
+let formImages = [];
 
 function escapeHtml(str) {
 	const div = document.createElement("div");
@@ -16,6 +16,17 @@ function formatPrice(value) {
 
 function makeId() {
 	return "p_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+}
+
+function getImages(p) {
+	if (Array.isArray(p.images)) return p.images.filter(Boolean);
+	return p.image ? [p.image] : [];
+}
+
+function normalizeProduct(p) {
+	p.images = getImages(p);
+	delete p.image;
+	return p;
 }
 
 function saveDraft() {
@@ -53,20 +64,47 @@ function renderTable() {
 		return;
 	}
 
-	body.innerHTML = products.map(p => `
-		<tr data-id="${escapeHtml(p.id)}">
-			<td data-label="Photo">${p.image ? `<img class="thumb" src="${escapeHtml(p.image)}" alt="">` : '<div class="thumb"></div>'}</td>
-			<td data-label="Title">${escapeHtml(p.title)}</td>
-			<td data-label="Price">${formatPrice(p.price)}</td>
-			<td data-label="Status">${p.sold ? '<span class="sold-tag">SOLD</span>' : '<span class="active-tag">Available</span>'}</td>
-			<td data-label="Actions">
-				<div class="row-actions">
-					<button type="button" class="btn btn-secondary btn-small" data-action="toggle-sold">${p.sold ? "Mark available" : "Mark sold"}</button>
-					<button type="button" class="btn btn-secondary btn-small" data-action="edit">Edit</button>
-					<button type="button" class="btn btn-danger btn-small" data-action="delete">Delete</button>
-				</div>
-			</td>
-		</tr>
+	body.innerHTML = products.map(p => {
+		const images = getImages(p);
+		return `
+			<tr data-id="${escapeHtml(p.id)}">
+				<td data-label="Photo">
+					<div class="thumb-wrap">
+						${images[0] ? `<img class="thumb" src="${escapeHtml(images[0])}" alt="">` : '<div class="thumb"></div>'}
+						${images.length > 1 ? `<span class="thumb-badge">${images.length}</span>` : ""}
+					</div>
+				</td>
+				<td data-label="Title">${escapeHtml(p.title)}</td>
+				<td data-label="Price">${formatPrice(p.price)}</td>
+				<td data-label="Status">${p.sold ? '<span class="sold-tag">SOLD</span>' : '<span class="active-tag">Available</span>'}</td>
+				<td data-label="Actions">
+					<div class="row-actions">
+						<button type="button" class="btn btn-secondary btn-small" data-action="toggle-sold">${p.sold ? "Mark available" : "Mark sold"}</button>
+						<button type="button" class="btn btn-secondary btn-small" data-action="edit">Edit</button>
+						<button type="button" class="btn btn-danger btn-small" data-action="delete">Delete</button>
+					</div>
+				</td>
+			</tr>
+		`;
+	}).join("");
+}
+
+function renderImageList() {
+	const list = document.getElementById("imageList");
+	if (!formImages.length) {
+		list.innerHTML = '<p class="empty-note">No photos added yet.</p>';
+		return;
+	}
+	list.innerHTML = formImages.map((src, i) => `
+		<div class="image-item">
+			<img src="${escapeHtml(src)}" alt="">
+			${i === 0 ? '<span class="image-item-badge">Cover</span>' : ""}
+			<div class="image-item-actions">
+				<button type="button" class="img-move" data-index="${i}" data-dir="-1" ${i === 0 ? "disabled" : ""} aria-label="Move left">&lsaquo;</button>
+				<button type="button" class="img-move" data-index="${i}" data-dir="1" ${i === formImages.length - 1 ? "disabled" : ""} aria-label="Move right">&rsaquo;</button>
+				<button type="button" class="img-remove" data-index="${i}" aria-label="Remove photo">&times;</button>
+			</div>
+		</div>
 	`).join("");
 }
 
@@ -76,13 +114,8 @@ function resetForm() {
 	document.getElementById("formTitle").textContent = "Add a product";
 	document.getElementById("submitBtn").textContent = "Add product";
 	document.getElementById("cancelEditBtn").hidden = true;
-	uploadedImageData = "";
-	updateImagePreview("");
-}
-
-function updateImagePreview(src) {
-	const preview = document.getElementById("imagePreview");
-	preview.innerHTML = src ? `<img src="${escapeHtml(src)}" alt="">` : "No photo";
+	formImages = [];
+	renderImageList();
 }
 
 function startEdit(id) {
@@ -92,10 +125,9 @@ function startEdit(id) {
 	document.getElementById("title").value = p.title || "";
 	document.getElementById("price").value = p.price ?? "";
 	document.getElementById("description").value = p.description || "";
-	document.getElementById("imageUrl").value = p.image && !p.image.startsWith("data:") ? p.image : "";
 	document.getElementById("sold").checked = !!p.sold;
-	uploadedImageData = p.image && p.image.startsWith("data:") ? p.image : "";
-	updateImagePreview(p.image || "");
+	formImages = getImages(p).slice();
+	renderImageList();
 	document.getElementById("formTitle").textContent = "Edit product";
 	document.getElementById("submitBtn").textContent = "Save changes";
 	document.getElementById("cancelEditBtn").hidden = false;
@@ -106,7 +138,7 @@ async function loadInitialProducts() {
 	const draft = localStorage.getItem(DRAFT_KEY);
 	if (draft) {
 		try {
-			products = JSON.parse(draft);
+			products = JSON.parse(draft).map(normalizeProduct);
 			document.getElementById("draftBanner").hidden = false;
 			return;
 		} catch (e) {
@@ -115,7 +147,7 @@ async function loadInitialProducts() {
 	}
 	try {
 		const res = await fetch(SITE_CONFIG.productsUrl, { cache: "no-store" });
-		products = res.ok ? await res.json() : [];
+		products = res.ok ? (await res.json()).map(normalizeProduct) : [];
 	} catch (e) {
 		console.error(e);
 		products = [];
@@ -145,18 +177,44 @@ async function copyJson() {
 
 (function init() {
 	loadInitialProducts().then(renderTable);
+	renderImageList();
 
-	document.getElementById("imageUrl").addEventListener("input", e => {
-		uploadedImageData = "";
-		updateImagePreview(e.target.value.trim());
+	document.getElementById("addUrlBtn").addEventListener("click", () => {
+		const input = document.getElementById("imageUrl");
+		const url = input.value.trim();
+		if (!url) return;
+		formImages.push(url);
+		input.value = "";
+		renderImageList();
 	});
 
 	document.getElementById("imageFile").addEventListener("change", async e => {
-		const file = e.target.files[0];
-		if (!file) return;
-		uploadedImageData = await fileToCompressedDataUrl(file);
-		document.getElementById("imageUrl").value = "";
-		updateImagePreview(uploadedImageData);
+		const files = Array.from(e.target.files || []);
+		for (const file of files) {
+			try {
+				formImages.push(await fileToCompressedDataUrl(file));
+			} catch (err) {
+				console.error(err);
+			}
+		}
+		e.target.value = "";
+		renderImageList();
+	});
+
+	document.getElementById("imageList").addEventListener("click", e => {
+		const moveBtn = e.target.closest(".img-move");
+		const removeBtn = e.target.closest(".img-remove");
+		if (moveBtn) {
+			const i = parseInt(moveBtn.dataset.index, 10);
+			const j = i + parseInt(moveBtn.dataset.dir, 10);
+			if (j < 0 || j >= formImages.length) return;
+			[formImages[i], formImages[j]] = [formImages[j], formImages[i]];
+			renderImageList();
+		} else if (removeBtn) {
+			const i = parseInt(removeBtn.dataset.index, 10);
+			formImages.splice(i, 1);
+			renderImageList();
+		}
 	});
 
 	document.getElementById("productForm").addEventListener("submit", e => {
@@ -165,17 +223,16 @@ async function copyJson() {
 		const title = document.getElementById("title").value.trim();
 		const price = parseFloat(document.getElementById("price").value);
 		const description = document.getElementById("description").value.trim();
-		const imageUrl = document.getElementById("imageUrl").value.trim();
 		const sold = document.getElementById("sold").checked;
-		const image = uploadedImageData || imageUrl;
+		const images = formImages.slice();
 
 		if (!title || isNaN(price)) return;
 
 		if (editingId) {
 			const p = products.find(x => x.id === editingId);
-			Object.assign(p, { title, price, description, image, sold });
+			Object.assign(p, { title, price, description, images, sold });
 		} else {
-			products.push({ id: makeId(), title, price, description, image, sold });
+			products.push({ id: makeId(), title, price, description, images, sold });
 		}
 
 		saveDraft();
@@ -215,7 +272,7 @@ async function copyJson() {
 		document.getElementById("draftBanner").hidden = true;
 		try {
 			const res = await fetch(SITE_CONFIG.productsUrl, { cache: "no-store" });
-			products = res.ok ? await res.json() : [];
+			products = res.ok ? (await res.json()).map(normalizeProduct) : [];
 		} catch (e) {
 			products = [];
 		}

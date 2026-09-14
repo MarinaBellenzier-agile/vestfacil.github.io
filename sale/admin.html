@@ -48,16 +48,17 @@
 						<label for="description">Description</label>
 						<textarea id="description"></textarea>
 					</div>
-					<div class="field">
-						<label for="imageUrl">Photo URL (optional)</label>
-						<input type="text" id="imageUrl" placeholder="https://...">
-					</div>
-					<div class="field">
-						<label for="imageFile">Or upload a photo</label>
-						<input type="file" id="imageFile" accept="image/*">
-					</div>
 					<div class="field full">
-						<div class="image-preview" id="imagePreview">No photo</div>
+						<label>Photos</label>
+						<div class="photo-add-row">
+							<input type="text" id="imageUrl" placeholder="Paste an image URL...">
+							<button type="button" class="btn btn-secondary btn-small" id="addUrlBtn">Add URL</button>
+						</div>
+						<div class="photo-add-row">
+							<input type="file" id="imageFile" accept="image/*" multiple>
+						</div>
+						<p class="field-hint">The first photo is the cover shown on the product grid. Use the arrows to reorder.</p>
+						<div class="image-list" id="imageList"></div>
 					</div>
 					<div class="field">
 						<label>
