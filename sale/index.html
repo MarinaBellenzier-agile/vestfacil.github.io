@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Moving Sale</title>
+	<meta name="description" content="Items for sale — moving out, everything must go.">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+	<header class="hero">
+		<div class="wrap">
+			<h1 id="siteTitle">Moving Sale</h1>
+			<p id="siteSubtitle">We're moving out and selling our things.</p>
+			<a id="contactLink" class="btn" href="#">Contact us</a>
+		</div>
+	</header>
+
+	<main class="wrap">
+		<div class="toolbar">
+			<input type="search" id="searchInput" placeholder="Search products...">
+			<label>
+				<input type="checkbox" id="showSoldToggle">
+				Show sold items
+			</label>
+		</div>
+
+		<div class="product-grid" id="productGrid">
+			<p class="empty">Loading products...</p>
+		</div>
+	</main>
+
+	<footer class="site-footer">
+		<div class="wrap">
+			<p>Managing the listings? <a href="admin.html">Go to product admin</a></p>
+		</div>
+	</footer>
+
+	<script src="config.js"></script>
+	<script src="script.js"></script>
+</body>
+</html>
