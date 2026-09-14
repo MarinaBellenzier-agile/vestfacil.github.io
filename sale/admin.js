@@ -55,11 +55,11 @@ function renderTable() {
 
 	body.innerHTML = products.map(p => `
 		<tr data-id="${escapeHtml(p.id)}">
-			<td>${p.image ? `<img class="thumb" src="${escapeHtml(p.image)}" alt="">` : '<div class="thumb"></div>'}</td>
-			<td>${escapeHtml(p.title)}</td>
-			<td>${formatPrice(p.price)}</td>
-			<td>${p.sold ? '<span class="sold-tag">SOLD</span>' : '<span class="active-tag">Available</span>'}</td>
-			<td>
+			<td data-label="Photo">${p.image ? `<img class="thumb" src="${escapeHtml(p.image)}" alt="">` : '<div class="thumb"></div>'}</td>
+			<td data-label="Title">${escapeHtml(p.title)}</td>
+			<td data-label="Price">${formatPrice(p.price)}</td>
+			<td data-label="Status">${p.sold ? '<span class="sold-tag">SOLD</span>' : '<span class="active-tag">Available</span>'}</td>
+			<td data-label="Actions">
 				<div class="row-actions">
 					<button type="button" class="btn btn-secondary btn-small" data-action="toggle-sold">${p.sold ? "Mark available" : "Mark sold"}</button>
 					<button type="button" class="btn btn-secondary btn-small" data-action="edit">Edit</button>
