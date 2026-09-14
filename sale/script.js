@@ -9,6 +9,10 @@ function formatPrice(value) {
 	return SITE_CONFIG.currencySymbol + (isNaN(n) ? "0.00" : n.toFixed(2));
 }
 
+function whatsappLink(message) {
+	return `https://wa.me/${SITE_CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
+}
+
 async function loadProducts() {
 	try {
 		const res = await fetch(SITE_CONFIG.productsUrl, { cache: "no-store" });
@@ -38,35 +42,33 @@ function renderProducts(products, state) {
 		return;
 	}
 
-	grid.innerHTML = filtered.map(p => `
-		<div class="product-card${p.sold ? " sold" : ""}">
-			<div class="product-image">
-				${p.image
-					? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.title)}" loading="lazy">`
-					: '<div class="no-image">No photo</div>'}
-				${p.sold ? '<span class="sold-badge">SOLD</span>' : ""}
+	grid.innerHTML = filtered.map(p => {
+		const wantLink = whatsappLink(`Hi Marina! I want the "${p.title}".`);
+		return `
+			<div class="product-card${p.sold ? " sold" : ""}">
+				<div class="product-image">
+					${p.image
+						? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.title)}" loading="lazy">`
+						: '<div class="no-image">No photo</div>'}
+					${p.sold ? '<span class="sold-badge">SOLD</span>' : ""}
+				</div>
+				<div class="product-info">
+					<h3>${escapeHtml(p.title)}</h3>
+					<p class="price">${formatPrice(p.price)}</p>
+					<p class="description">${escapeHtml(p.description || "")}</p>
+					${p.sold
+						? '<span class="btn btn-cta btn-disabled">Sold out</span>'
+						: `<a class="btn btn-cta" href="${wantLink}" target="_blank" rel="noopener">I want this!</a>`}
+				</div>
 			</div>
-			<div class="product-info">
-				<h3>${escapeHtml(p.title)}</h3>
-				<p class="price">${formatPrice(p.price)}</p>
-				<p class="description">${escapeHtml(p.description || "")}</p>
-			</div>
-		</div>
-	`).join("");
+		`;
+	}).join("");
 }
 
 (async function init() {
 	document.getElementById("siteTitle").textContent = SITE_CONFIG.title;
 	document.getElementById("siteSubtitle").textContent = SITE_CONFIG.subtitle;
-
-	const contactLink = document.getElementById("contactLink");
-	if (SITE_CONFIG.contactWhatsapp) {
-		contactLink.href = SITE_CONFIG.contactWhatsapp;
-		contactLink.textContent = "Contact via WhatsApp";
-	} else {
-		contactLink.href = "mailto:" + SITE_CONFIG.contactEmail;
-		contactLink.textContent = "Contact via Email";
-	}
+	document.getElementById("contactLink").href = whatsappLink("Hi Marina! I have a question about your moving sale.");
 
 	const products = await loadProducts();
 	const state = { search: "", showSold: false };
