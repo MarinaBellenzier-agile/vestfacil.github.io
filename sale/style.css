@@ -254,6 +254,123 @@ header.hero p {
 	height: 100%;
 	object-fit: cover;
 	display: block;
+	cursor: zoom-in;
+}
+
+.img-nav {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	border: none;
+	background: rgba(0, 0, 0, .45);
+	color: #fff;
+	font-size: 1.3rem;
+	line-height: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	padding: 0;
+}
+
+.img-nav:hover { background: rgba(0, 0, 0, .65); }
+.img-nav.prev { left: .5rem; }
+.img-nav.next { right: .5rem; }
+
+.img-counter {
+	position: absolute;
+	bottom: .5rem;
+	right: .6rem;
+	background: rgba(0, 0, 0, .55);
+	color: #fff;
+	font-size: .7rem;
+	font-weight: 600;
+	padding: .15rem .5rem;
+	border-radius: 999px;
+}
+
+/* ---- Lightbox (fullscreen photo viewer) ---- */
+
+.lightbox {
+	position: fixed;
+	inset: 0;
+	background: rgba(10, 10, 10, .94);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+	padding: 3.5rem 1rem;
+}
+
+.lightbox[hidden] { display: none; }
+
+.lightbox-img {
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
+	border-radius: 6px;
+}
+
+.lightbox-close {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	width: 42px;
+	height: 42px;
+	border-radius: 50%;
+	border: none;
+	background: rgba(255, 255, 255, .12);
+	color: #fff;
+	font-size: 1.6rem;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+
+.lightbox-close:hover { background: rgba(255, 255, 255, .22); }
+
+.lightbox-nav {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 46px;
+	height: 46px;
+	border-radius: 50%;
+	border: none;
+	background: rgba(255, 255, 255, .12);
+	color: #fff;
+	font-size: 1.9rem;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+
+.lightbox-nav:hover { background: rgba(255, 255, 255, .22); }
+.lightbox-prev { left: .75rem; }
+.lightbox-next { right: .75rem; }
+
+.lightbox-counter {
+	position: absolute;
+	bottom: 1rem;
+	left: 50%;
+	transform: translateX(-50%);
+	color: #fff;
+	font-size: .8rem;
+	background: rgba(255, 255, 255, .12);
+	padding: .3rem .85rem;
+	border-radius: 999px;
+}
+
+@media (max-width: 480px) {
+	.lightbox-nav { width: 40px; height: 40px; font-size: 1.6rem; }
+	.lightbox-close { width: 38px; height: 38px; font-size: 1.4rem; }
 }
 
 .no-image {
@@ -456,24 +573,98 @@ footer.site-footer a { color: var(--muted); }
 
 .field textarea { resize: vertical; min-height: 70px; }
 
-.image-preview {
-	margin-top: .6rem;
-	width: 130px;
-	height: 98px;
-	border-radius: 10px;
-	overflow: hidden;
+.photo-add-row {
+	display: flex;
+	gap: .5rem;
+	margin-bottom: .6rem;
+}
+
+.photo-add-row input[type="text"] { flex: 1; min-width: 0; }
+
+.field-hint {
+	margin: .2rem 0 .3rem;
+	font-size: .8rem;
+	color: var(--muted);
+}
+
+.image-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .7rem;
+	margin-top: .5rem;
+}
+
+.empty-note {
+	color: var(--muted);
+	font-size: .85rem;
+	margin: .5rem 0 0;
+}
+
+.image-item {
+	position: relative;
+	width: 96px;
+}
+
+.image-item img {
+	width: 96px;
+	height: 72px;
+	object-fit: cover;
+	border-radius: 8px;
+	border: 1px solid var(--border);
+	display: block;
 	background: #f1efea;
+}
+
+.image-item-badge {
+	position: absolute;
+	top: 4px;
+	left: 4px;
+	background: var(--ink);
+	color: #fff;
+	font-size: .6rem;
+	font-weight: 700;
+	padding: .05rem .4rem;
+	border-radius: 999px;
+}
+
+.image-item-actions {
+	display: flex;
+	gap: .3rem;
+	margin-top: .35rem;
+	justify-content: center;
+}
+
+.image-item-actions button {
+	width: 28px;
+	height: 28px;
+	border-radius: 6px;
+	border: 1px solid var(--border);
+	background: #fff;
+	font-size: .9rem;
+	line-height: 1;
+	cursor: pointer;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: var(--muted);
-	font-size: .75rem;
+	padding: 0;
 }
 
-.image-preview img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
+.image-item-actions button:disabled { opacity: .35; cursor: default; }
+.img-remove { color: var(--danger); }
+
+.thumb-wrap { position: relative; display: inline-block; }
+
+.thumb-badge {
+	position: absolute;
+	bottom: -5px;
+	right: -5px;
+	background: var(--ink);
+	color: #fff;
+	font-size: .65rem;
+	font-weight: 700;
+	padding: .05rem .38rem;
+	border-radius: 999px;
+	line-height: 1.3;
 }
 
 .form-actions {

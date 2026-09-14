@@ -4,7 +4,7 @@
 		"title": "Sample Sofa (edit or delete me)",
 		"price": 150,
 		"description": "This is a sample product. Go to admin.html to edit, delete, or add your own products with photos.",
-		"image": "",
+		"images": [],
 		"sold": false
 	},
 	{
@@ -12,7 +12,7 @@
 		"title": "Sample Dining Table",
 		"price": 80,
 		"description": "Another sample item — mark it sold or remove it from the admin page.",
-		"image": "",
+		"images": [],
 		"sold": true
 	}
 ]
