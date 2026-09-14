@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Product Admin — Moving Sale</title>
+	<meta name="robots" content="noindex, nofollow">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+	<div class="wrap">
+		<div class="admin-header">
+			<h1>Product Admin</h1>
+			<p>Add, edit, and mark products as sold. <a href="index.html">View the public page &rarr;</a></p>
+		</div>
+
+		<div id="draftBanner" class="draft-banner" hidden>
+			<span>You have unsaved changes from a previous session.</span>
+			<button type="button" class="btn btn-secondary btn-small" id="discardDraftBtn">Discard &amp; reload from products.json</button>
+		</div>
+
+		<div class="notice">
+			This site is static (hosted on GitHub Pages), so there is no live database. Changes you make
+			here are saved in <em>this browser only</em> until you publish them: click
+			<strong>Download products.json</strong> below, then replace <code>sale/products.json</code> in your
+			repository with the downloaded file and commit &amp; push (or upload it via github.com). Once pushed,
+			the changes show up for everyone on the public page.
+		</div>
+
+		<div class="panel">
+			<h2 id="formTitle">Add a product</h2>
+			<form id="productForm">
+				<input type="hidden" id="editingId">
+				<div class="form-grid">
+					<div class="field">
+						<label for="title">Title *</label>
+						<input type="text" id="title" required>
+					</div>
+					<div class="field">
+						<label for="price">Price *</label>
+						<input type="number" id="price" min="0" step="0.01" required>
+					</div>
+					<div class="field full">
+						<label for="description">Description</label>
+						<textarea id="description"></textarea>
+					</div>
+					<div class="field">
+						<label for="imageUrl">Photo URL (optional)</label>
+						<input type="text" id="imageUrl" placeholder="https://...">
+					</div>
+					<div class="field">
+						<label for="imageFile">Or upload a photo</label>
+						<input type="file" id="imageFile" accept="image/*">
+					</div>
+					<div class="field full">
+						<div class="image-preview" id="imagePreview">No photo</div>
+					</div>
+					<div class="field">
+						<label>
+							<input type="checkbox" id="sold">
+							Already sold
+						</label>
+					</div>
+				</div>
+				<div class="form-actions">
+					<button type="submit" class="btn btn-primary" id="submitBtn">Add product</button>
+					<button type="button" class="btn btn-secondary" id="cancelEditBtn" hidden>Cancel edit</button>
+				</div>
+			</form>
+		</div>
+
+		<div class="panel">
+			<h2>Products (<span id="productCount">0</span>)</h2>
+			<div class="actions-bar">
+				<button type="button" class="btn btn-primary" id="downloadBtn">Download products.json</button>
+				<button type="button" class="btn btn-secondary" id="copyBtn">Copy JSON to clipboard</button>
+			</div>
+			<table class="admin-table">
+				<thead>
+					<tr>
+						<th>Photo</th>
+						<th>Title</th>
+						<th>Price</th>
+						<th>Status</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody id="productTableBody"></tbody>
+			</table>
+		</div>
+	</div>
+
+	<script src="config.js"></script>
+	<script src="admin.js"></script>
+</body>
+</html>
