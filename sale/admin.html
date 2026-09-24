@@ -12,6 +12,17 @@
 </head>
 <body>
 
+	<div id="authGate" class="auth-gate">
+		<form id="authForm" class="auth-card">
+			<h2>Admin access</h2>
+			<p>Enter the admin password to continue.</p>
+			<input type="password" id="authPassword" placeholder="Password" autocomplete="current-password" required>
+			<p id="authError" class="auth-error" hidden>Incorrect password, try again.</p>
+			<button type="submit" class="btn btn-primary">Unlock</button>
+		</form>
+	</div>
+
+	<div id="adminContent" hidden>
 	<div class="wrap">
 		<div class="admin-header">
 			<h1>Product Admin</h1>
@@ -94,8 +105,10 @@
 			</table>
 		</div>
 	</div>
+	</div>
 
 	<script src="config.js"></script>
+	<script src="auth.js"></script>
 	<script src="admin.js"></script>
 </body>
 </html>
